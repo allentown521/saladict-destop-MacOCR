@@ -48,6 +48,7 @@ jobs:
           <dict>
               <key>com.apple.security.app-sandbox</key>
               <true/>
+              
               <!-- 添加您需要的其他权限 -->
           </dict>
           </plist>
