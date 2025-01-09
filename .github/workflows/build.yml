@@ -56,21 +56,46 @@ jobs:
 
       - name: Build Swift Script
         run: |
+          # 先编译二进制文件
           # x86_64 版本
           xcrun swiftc -target x86_64-apple-macos10.15 \
             -sdk $(xcrun --show-sdk-path) \
-            -profile ~/Library/MobileDevice/Provisioning\ Profiles/profile.provisionprofile \
-            -sign "Developer ID Application: YOUR NAME" \
-            -entitlements entitlements.plist \
             -o ocr-x86_64-apple-darwin main.swift
 
           # arm64 版本
           xcrun swiftc -target arm64-apple-macos11 \
             -sdk $(xcrun --show-sdk-path) \
-            -profile ~/Library/MobileDevice/Provisioning\ Profiles/profile.provisionprofile \
-            -sign "Developer ID Application: YOUR NAME" \
-            -entitlements entitlements.plist \
             -o ocr-aarch64-apple-darwin main.swift
+
+          # 创建 .app 结构并添加 profile
+          # x86_64 版本
+          mkdir -p OCR-x86_64.app/Contents/MacOS
+          cp ocr-x86_64-apple-darwin OCR-x86_64.app/Contents/MacOS/
+          cp ~/Library/MobileDevice/Provisioning\ Profiles/profile.provisionprofile OCR-x86_64.app/Contents/embedded.provisionprofile
+
+          # arm64 版本
+          mkdir -p OCR-arm64.app/Contents/MacOS
+          cp ocr-aarch64-apple-darwin OCR-arm64.app/Contents/MacOS/
+          cp ~/Library/MobileDevice/Provisioning\ Profiles/profile.provisionprofile OCR-arm64.app/Contents/embedded.provisionprofile
+
+          # 签名 .app 包
+          codesign --force \
+            --sign "3rd Party Mac Developer Application: town allen (55U9H2H3UA)" \
+            --entitlements entitlements.plist \
+            --options runtime \
+            --timestamp \
+            OCR-x86_64.app
+
+          codesign --force \
+            --sign "3rd Party Mac Developer Application: town allen (55U9H2H3UA)" \
+            --entitlements entitlements.plist \
+            --options runtime \
+            --timestamp \
+            OCR-arm64.app
+
+          # 复制签名后的二进制文件回原位
+          cp OCR-x86_64.app/Contents/MacOS/ocr-x86_64-apple-darwin ./
+          cp OCR-arm64.app/Contents/MacOS/ocr-aarch64-apple-darwin ./
 
       - name: Test
         run: ./ocr-x86_64-apple-darwin $(pwd)/test.jpg auto
