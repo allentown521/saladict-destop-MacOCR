@@ -19,7 +19,9 @@ jobs:
       - name: Build Swift Script
         run: |
           swiftc -target x86_64-apple-macos10.15 -o ocr-x86_64-apple-darwin main.swift
+          chmod +x ocr-x86_64-apple-darwin
           swiftc -target arm64-apple-macos11 -o ocr-aarch64-apple-darwin main.swift
+          chmod +x ocr-aarch64-apple-darwin
 
       - name: Test
         run: ./ocr-x86_64-apple-darwin $(pwd)/test.jpg auto
