@@ -27,6 +27,11 @@ jobs:
           chmod 755 ocr-aarch64-apple-darwin
           ls -l ocr-x86_64-apple-darwin ocr-aarch64-apple-darwin
 
+      - name: Create Archives
+        run: |
+          tar -czf ocr-x86_64-apple-darwin.tar.gz ocr-x86_64-apple-darwin
+          tar -czf ocr-aarch64-apple-darwin.tar.gz ocr-aarch64-apple-darwin
+
       - name: Test
         run: ./ocr-x86_64-apple-darwin $(pwd)/test.jpg auto
 
@@ -34,10 +39,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ocr-x86_64-apple-darwin
-          path: ./ocr-x86_64-apple-darwin
+          path: ./ocr-x86_64-apple-darwin.tar.gz
 
       - name: Upload Binary
         uses: actions/upload-artifact@v3
         with:
           name: ocr-aarch64-apple-darwin
-          path: ./ocr-aarch64-apple-darwin
+          path: ./ocr-aarch64-apple-darwin.tar.gz
